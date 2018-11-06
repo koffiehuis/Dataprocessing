@@ -1,0 +1,5 @@
+A branch is a  line of commits, where the tip of the branch
+represents the most recent commit made for this project (or branch).
+
+Via this branch we are enabled to revisit earlier versions of our
+work and restore these files.

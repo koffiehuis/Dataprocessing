@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# Name:
-# Student number:
+# Name: Mark van Malestein
+# Student number: 10807640
 """
 This script crawls the IMDB top 250 movies.
 """

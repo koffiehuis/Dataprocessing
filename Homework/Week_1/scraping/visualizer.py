@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# Name:
-# Student number:
+# Name: Mark van Malestein
+# Student number: 10807640
 """
 This script visualizes data obtained from a .csv file
 """
@@ -38,6 +38,6 @@ with open(INPUT_CSV, newline="") as csvfile:
     plt.title("Rating of top 50 films per year")
 
     plt.show()
-    
+
 if __name__ == "__main__":
     print(data_dict)

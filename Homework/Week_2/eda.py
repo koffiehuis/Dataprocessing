@@ -59,14 +59,10 @@ def central_tendency(df):
     length = len(GDP_list)
     sorted_GDP = sorted(GDP_list_int)
 
-    mean_self = sum(GDP_list_int)/len(GDP_list)
 
-    if length % 2 == 0:
-        median_self = sorted_GDP[int(length + 1 / 2)]
-    else:
-        median_self = (sorted_GDP[int(length /2)] + sorted_GDP[int((length + 2) / 2)]) / 2
-
-    mode_self = max(set(GDP_list), key = GDP_list.count)
+    mean_GDP = mean(GDP_list_int)
+    median_GDP = median(GDP_list_int)
+    mode_GDP = mode(GDP_list_int)
 
 
 if __name__ == '__main__':

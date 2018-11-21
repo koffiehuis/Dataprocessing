@@ -18,7 +18,7 @@
 
     // "M", 400, 1995 and "F", 400, 1985 are some settings
     // which yield charts that are easy to read
-    var sex = localStorage.getItem("sex");
+    var sex = toUpperCase(localStorage.getItem("sex"));
     var countThreshold = parseInt(localStorage.getItem("count"));
     var fromYear = parseInt(localStorage.getItem("year"));
 

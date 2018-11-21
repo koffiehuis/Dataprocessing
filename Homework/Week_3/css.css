@@ -1,23 +1,23 @@
 body {
-    background-color: lightgrey;
+  background-color: lightgrey;
 }
 
 h1 {
-    font-family: Arial;
-    color: black;
-    margin-left: 20px;
+  font-family: Arial;
+  color: black;
+  margin-left: 20px;
 }
 
 h2 {
-    font-family: Arial;
+  font-family: Arial;
 }
 
 #myCanvas {
-   width: 100%;
-   text-align:center;
-   background-color: white;
+  width: 100%;
+  text-align:center;
+  background-color: white;
 }
 
 canvas {
-   display: inline;
+  display: inline;
 }

@@ -3,15 +3,15 @@
 <!-- 10807640 -->
 <html>
 <head>
-<title>Startpage line chart options</title>
-<link rel="stylesheet" type="text/css" href="css.css">
+  <title>Startpage line chart options</title>
+  <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
   <h1>Enter the values for this chart</h1>
   <h2>for example 1985, 400, F</h2>
   <h2>Or leave empty and get some default settings</h2>
   <h2>Refresh page to re-enter values</h2>
-<script>
+  <script>
   window.onload = function() {
     var getInput = prompt("Enter starting year (YYYY)");
     localStorage.setItem("year",getInput);
@@ -19,7 +19,7 @@
     localStorage.setItem("count",getInput);
     var getInput = prompt("Enter sex (M/F) ");
     localStorage.setItem("sex",getInput);
-}
+  }
 </script>
 <h2><a target="_blank" href="html.html">Go to chart</a><h2>
 </body>

@@ -3,14 +3,14 @@
 <!-- 10807640 -->
 <html>
 <head>
-<title>Line chart baby names</title>
-<link rel="stylesheet" type="text/css" href="css.css">
+  <title>Line chart baby names</title>
+  <link rel="stylesheet" type="text/css" href="css.css">
 </head>
-  <body>
-    <h1 align="center">Frequency of Popular Baby Names in New Zealand</h1>
-    <canvas id="myCanvas" height=800px; width=1400px; style="border:1px solid #000000;">
+<body>
+  <h1 align="center">Frequency of Popular Baby Names in New Zealand</h1>
+  <canvas id="myCanvas" height=800px; width=1400px; style="border:1px solid #000000;">
     Your browser does not support the HTML5 canvas tag.</canvas>
-  <script>
+    <script>
 
     // Initializing variables, sex and countThreshold can be changed to
     // show different charts
@@ -24,7 +24,7 @@
 
     // Check whether user input is given, if not use default values
     if (fromYear == "null" || countThreshold == "null" || sex == "null"
-        || isNaN(fromYear) || isNaN(countThreshold)) {
+    || isNaN(fromYear) || isNaN(countThreshold)) {
       sex = "F";
       countThreshold = 400;
       fromYear = 1985;
@@ -42,145 +42,145 @@
     // Parse JSON file
     var txtFile = new XMLHttpRequest();
     txtFile.onreadystatechange = function() {
-        if (txtFile.readyState === 4 && txtFile.status == 200) {
-            var json = JSON.parse(txtFile.responseText);
-            for (index = 0; index < json.length; index ++) {
+      if (txtFile.readyState === 4 && txtFile.status == 200) {
+        var json = JSON.parse(txtFile.responseText);
+        for (index = 0; index < json.length; index ++) {
 
-              // Apply sex and starting-year criteria
-              if (json[index]["Year"] >= fromYear){
-                if (json[index]["Sex"] == sex) {
-                  data.push(json[index])
-                }
-              }
+          // Apply sex and starting-year criteria
+          if (json[index]["Year"] >= fromYear){
+            if (json[index]["Sex"] == sex) {
+              data.push(json[index])
             }
+          }
+        }
 
-            // Functions to transform X and Y coordinates
-            function transformX(coordinate) {
-              return (coordinate * (50 * 23 / nYears) + padding)
-            }
+        // Functions to transform X and Y coordinates
+        function transformX(coordinate) {
+          return (coordinate * (50 * 23 / nYears) + padding)
+        }
 
-            function transformY(coordinate) {
-              return ((h - coordinate * ((h - padding) / 800)) - padding)
-            }
+        function transformY(coordinate) {
+          return ((h - coordinate * ((h - padding) / 800)) - padding)
+        }
 
 
 
-            // Extract relevant data and put coordinates in correct format
-            var coordinates = [];
-            var names = [];
-            data.forEach(function(element) {
-              coordinates.push({id: element.Name,
-                x: transformX(parseInt(element.Year) - fromYear),
-                y: transformY(parseInt(element.Count))
-              })
+        // Extract relevant data and put coordinates in correct format
+        var coordinates = [];
+        var names = [];
+        data.forEach(function(element) {
+          coordinates.push({id: element.Name,
+            x: transformX(parseInt(element.Year) - fromYear),
+            y: transformY(parseInt(element.Count))
+          })
 
-              names.push(element.Name)
-            });
+          names.push(element.Name)
+        });
 
-            // Extract 'popular' names based off user input, if any
-            var namesHigh = [];
-            for (var i = 0; i < names.length; i++){
-              if (coordinates[i].y < transformY(countThreshold)){
-                namesHigh.push(names[i])
-              }
-            }
+        // Extract 'popular' names based off user input, if any
+        var namesHigh = [];
+        for (var i = 0; i < names.length; i++){
+          if (coordinates[i].y < transformY(countThreshold)){
+            namesHigh.push(names[i])
+          }
+        }
 
-            // Extract coordinates of 'popular' names
-            // Method given in link below
-            // https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
-            var singleNames = [];
-            singleNames = namesHigh.filter(function(item, index) {
-              return namesHigh.indexOf(item) == index;
-            })
-            var dataPoints = [];
+        // Extract coordinates of 'popular' names
+        // Method given in link below
+        // https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
+        var singleNames = [];
+        singleNames = namesHigh.filter(function(item, index) {
+          return namesHigh.indexOf(item) == index;
+        })
+        var dataPoints = [];
 
-            // Apply selective changes to coordinates array
-            for (var i = 0; i < singleNames.length; i++) {
-              var smallArray = coordinates.filter(item => {
-                return item.id === singleNames[i]
-              })
-              dataPoints.push(smallArray)
-            }
+        // Apply selective changes to coordinates array
+        for (var i = 0; i < singleNames.length; i++) {
+          var smallArray = coordinates.filter(item => {
+            return item.id === singleNames[i]
+          })
+          dataPoints.push(smallArray)
+        }
 
-            // Apply canvas function
-            var canvas = document.getElementById('myCanvas');
-            var ctx = canvas.getContext("2d")
+        // Apply canvas function
+        var canvas = document.getElementById('myCanvas');
+        var ctx = canvas.getContext("2d")
 
-            // X- and Y-axis lables in correct orientation
-            ctx.font = "25px arial";
-            ctx.rotate(-90 * Math.PI / 180);
-            ctx.fillText("Frequency", -transformY(h / 2), 40);
-            ctx.rotate(90 * Math.PI / 180);
-            ctx.fillText("Year", (w / 2 - padding / 2), transformY(-60))
+        // X- and Y-axis lables in correct orientation
+        ctx.font = "25px arial";
+        ctx.rotate(-90 * Math.PI / 180);
+        ctx.fillText("Frequency", -transformY(h / 2), 40);
+        ctx.rotate(90 * Math.PI / 180);
+        ctx.fillText("Year", (w / 2 - padding / 2), transformY(-60))
 
-            ctx.font = "12px arial"
+        ctx.font = "12px arial"
 
-            // Y-axis
-            ctx.beginPath();
-            ctx.moveTo(padding, transformY(0));
-            ctx.lineTo(padding, transformY(1000));
-            ctx.stroke();
+        // Y-axis
+        ctx.beginPath();
+        ctx.moveTo(padding, transformY(0));
+        ctx.lineTo(padding, transformY(1000));
+        ctx.stroke();
 
-            // X-axis ticks
-            for (var i = 0; i < nYears; i++){
-              ctx.beginPath();
-              ctx.moveTo(transformX(i), transformY(0));
-              ctx.lineTo(transformX(i), transformY(-10));
-              ctx.fillText((i + fromYear), (transformX(i) - 10), transformY(-25))
-              ctx.stroke();
-            }
+        // X-axis ticks
+        for (var i = 0; i < nYears; i++){
+          ctx.beginPath();
+          ctx.moveTo(transformX(i), transformY(0));
+          ctx.lineTo(transformX(i), transformY(-10));
+          ctx.fillText((i + fromYear), (transformX(i) - 10), transformY(-25))
+          ctx.stroke();
+        }
 
-            // Y-axis grids and ticks
-            for (var i = 0; i < 8; i++){
-              ctx.beginPath();
-              ctx.moveTo((padding - 10), transformY(100 * i));
-              ctx.lineTo((w - 150), transformY(100 * i));
-              ctx.fillText((i * 100), 65, transformY(i * 100 - 5))
-              ctx.stroke();
-            }
+        // Y-axis grids and ticks
+        for (var i = 0; i < 8; i++){
+          ctx.beginPath();
+          ctx.moveTo((padding - 10), transformY(100 * i));
+          ctx.lineTo((w - 150), transformY(100 * i));
+          ctx.fillText((i * 100), 65, transformY(i * 100 - 5))
+          ctx.stroke();
+        }
 
-            // color list to iterate through, can show 22 different colors
-            colorList = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231',
-            '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080',
-            '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000',
-            '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000'];
+        // color list to iterate through, can show 22 different colors
+        colorList = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231',
+        '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080',
+        '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000',
+        '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000'];
 
-            // calculates Y coordinates for legend items
-            legendList = [];
-            var location;
-            for (var index = 0; index < singleNames.length; index++) {
-              location = transformY((h / (singleNames.length)) * index)
-              legendList.push(location)
-            }
+        // calculates Y coordinates for legend items
+        legendList = [];
+        var location;
+        for (var index = 0; index < singleNames.length; index++) {
+          location = transformY((h / (singleNames.length)) * index)
+          legendList.push(location)
+        }
 
-            // Plot lines and legend
-            ctx.lineWidth = 4;
-            ctx.lineJoin = "round";
-            ctx.font = "20px arial"
-            for (var i = 0; i < singleNames.length; i++){
-              ctx.beginPath();
-              ctx.strokeStyle = colorList[(i % 22)];
-              ctx.moveTo((w - 100), legendList[i]);
-              ctx.lineTo((w - 50), legendList[i]);
-              ctx.fillText(singleNames[i], (w - 100),  legendList[i] + 25)
-              ctx.stroke();
-              ctx.beginPath();
-              ctx.moveTo(dataPoints[i][0].x, dataPoints[i][0].y);
-              for (var j = 1; j < dataPoints[i].length; j++){
-                ctx.lineTo(dataPoints[i][j].x, dataPoints[i][j].y);
-              }
-              ctx.stroke();
-            }
-          };
-        };
-        txtFile.open("GET", fileName);
-        txtFile.send();
-  </script>
-  <h2 align="center">This chart shows the frequency of 'popular' baby names in New Zealand.</h2>
-  <h2 align="center">If we use 400 as a threshold, only names which have exceeded 400 at some point will be displayed.</h2>
-  <h2 align="center">Starting year, sex and 'popularity' threshold can be assigned from cheap_form.html.</h2><br>
-  <h2 align="center">JavaScript Data Line Chart by Mark van Malestein (10807640).</h2>
-  <h2 align="center">Data set can be found <a target="_blank" href="https://catalogue.data.govt.nz/dataset/baby-name-popularity-over-time">here</a></h2>
-</body>
+        // Plot lines and legend
+        ctx.lineWidth = 4;
+        ctx.lineJoin = "round";
+        ctx.font = "20px arial"
+        for (var i = 0; i < singleNames.length; i++){
+          ctx.beginPath();
+          ctx.strokeStyle = colorList[(i % 22)];
+          ctx.moveTo((w - 100), legendList[i]);
+          ctx.lineTo((w - 50), legendList[i]);
+          ctx.fillText(singleNames[i], (w - 100),  legendList[i] + 25)
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(dataPoints[i][0].x, dataPoints[i][0].y);
+          for (var j = 1; j < dataPoints[i].length; j++){
+            ctx.lineTo(dataPoints[i][j].x, dataPoints[i][j].y);
+          }
+          ctx.stroke();
+        }
+      };
+    };
+    txtFile.open("GET", fileName);
+    txtFile.send();
+    </script>
+    <h2 align="center">This chart shows the frequency of 'popular' baby names in New Zealand.</h2>
+    <h2 align="center">If we use 400 as a threshold, only names which have exceeded 400 at some point will be displayed.</h2>
+    <h2 align="center">Starting year, sex and 'popularity' threshold can be assigned from cheap_form.html.</h2><br>
+    <h2 align="center">JavaScript Data Line Chart by Mark van Malestein (10807640).</h2>
+    <h2 align="center">Data set can be found <a target="_blank" href="https://catalogue.data.govt.nz/dataset/baby-name-popularity-over-time">here</a></h2>
+  </body>
 
-</html>
+  </html>

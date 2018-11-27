@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="d3/d3.js"></script>
+    <script src='https://cdn.jsdelivr.net/lodash/4.17.2/lodash.min.js'></script>
+    <link rel="stylesheet" type="text/css" href="bars.css">
+  </head>
+  <body>
+    <script type="text/javascript">
+
+    // Add Text in the D3 way, cause why not
+    d3.select("head").append("title").text("D3 BarChart");
+    d3.select("body").append("h1").text("D3 BarChart").attr("align", "center");
+    d3.select("body").append("h2").text("Mark van Malestein\n10807640").attr("align", "center");
+    d3.select("body").append("p").text("This chart shows the amount of renewable energy in KTOE produced each year!").attr("align", "center");
+    d3.select("body").append("p").text("Bored of this chart? Select a new one at the left-bottom of this page.").attr("align", "center");
+
+    // Load json and start with all countries and make sure average is included
+    var fileName = "json.json"
+    var data = d3.json(fileName).then(function(lines) {
+      countries = ["AVERAGE"];
+
+      // Get the country names and remove duplicates
+      for (var i = 0; i < lines.length; i++) {
+        countries.push(lines[i].LOCATION)
+      }
+      countryNames = [];
+      countryNames = countries.filter(function(item, index) {
+        return countries.indexOf(item) == index;
+      })
+
+      // Remove OECD from country names
+      countryNames.pop()
+
+      // Make start chart the averages of all countries
+      country = "AVERAGE";
+
+      // Gives option button, with all countries and AVERAGE
+      d3.select("body").append("select")
+        .attr("class", "select")
+        .on("change", onchange)
+        .selectAll('option')
+      	.data(countryNames).enter()
+      	.append('option')
+      		.text(function (d) { return d; });
+
+      // If it changes, reload chart
+      function onchange() {
+    	   country = d3.select('select').property('value')
+         reload(country)
+       };
+
+
+        // Grouping data and sorting on KTOE
+        var groupMeasure = _.groupBy(lines, obj => obj.MEASURE);
+        var ktoe = groupMeasure["KTOE"]
+        var groupYear = _.groupBy(ktoe, obj => obj.TIME);
+        var years = Object.keys(groupYear);
+
+        // Make sure chart is initially loaded
+        reload(country)
+
+        // The chart-making function
+        function reload(country) {
+
+        // If a specific country is chosen, change the dataset
+        if (country.trim() !== "AVERAGE") {
+          d3.selectAll("svg").remove();
+          tempArray = [];
+          Array.prototype.forEach.call(ktoe, function(element) {
+            if (element.LOCATION == country.trim()) {
+              tempArray.push(element)
+            }
+          })
+          groupYear = _.groupBy(tempArray, obj => obj.TIME);
+        }
+
+        // Else show averages again. This makes sure that when AVERAGE is
+        // reselected, the old graph is removed
+        else {
+          d3.selectAll("svg").remove();
+          groupYear = _.groupBy(ktoe, obj => obj.TIME);
+        }
+
+        // Calculate averages, pretty irrelevant for the country specific
+        // options. But i ran out of time
+        var values = [];
+        for (index = 0; index < years.length; index++) {
+          sum = 0.0;
+          counter = 0;
+          objects = Object.values(groupYear[years[index]])
+          objects.forEach(function(element) {
+            if (isNaN(parseFloat(element.Value)) === false) {
+              sum += parseFloat(element.Value)
+              counter += 1
+            }
+          })
+          values.push(sum / counter);
+        }
+
+        // Sizing up the chart
+        var margin = {top: 20, right: 10, bottom: 50, left: 80};
+        var w = 1000 - margin.left - margin.right;
+        var h = 600 - margin.top - margin.bottom;
+        var barPadding = 3;
+
+        // Colorlist, from red to green
+        var colorList = ["#F92914", "#F93E13", "#F95312", "#F96911", "#F97E10",
+          "#F99410", "#F9C00E", "#F9C00E", "#F9D70D", "#F9ED0C", "#EFF90C",
+          "#D9F90B", "#C2F90A", "#ABF909", "#94F908", "#65F907", "#4DF906",
+          "#35F905",  "#1EF905"];
+
+        // Functions to transform coordinates
+        var Yscale = d3.scaleLinear()
+                      .domain([0, d3.max(values)])
+                      .range([h, 0]);
+
+        var Xscale = d3.scaleLinear()
+                      .domain([d3.min(years), d3.max(years)])
+                      .range([0, w]);
+
+        // Make room for the chart and initialize svg
+        var svg = d3.select("body")
+          .append("svg")
+          .attr("width", w + margin.left + margin.right)
+          .attr("height", h + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Make the bars and other elements
+        svg.selectAll("rect")
+          // Load data and transform to bars
+          .data(values)
+          .enter()
+          .append("rect")
+            .attr("x", function(d, i) {
+              return i * (w / values.length);
+            })
+            .attr("y", function(d) {
+              return Yscale(d);
+            })
+            .attr("width", w / values.length - barPadding )
+            .attr("height", function(d) {
+              return h - Yscale(d);
+
+            // Color and bordor for bars
+            })
+            .attr("fill", function(d) {
+              index = parseInt((d / d3.max(values)) * 18);
+              return colorList[index]
+            })
+            .attr('stroke', 'black')
+            .attr('stroke-width', '.5')
+
+            // Show tooltip and change bar's color when the cursor hovers over
+            .on("mouseover", function(d) {
+              div.transition()
+                   .duration(200)
+                   .style("opacity", .8);
+               div .html("KTOE:" + "<br>" + Math.round(d))
+                   .style("left", (d3.event.pageX) + "px")
+                   .style("top", (d3.event.pageY - 30) + "px");
+              d3.select(this)
+              .attr("fill", "blue");
+               })
+              .on("mouseout", function(d) {
+               div.transition()
+                   .duration(500)
+                   .style("opacity", 0);
+               d3.select(this)
+                   .attr("fill", function(d) {
+                     index = parseInt((d / d3.max(values)) * 18);
+                     return colorList[index]
+                   })
+              });
+
+        // Make the axes
+        var xAxis = d3.axisBottom()
+          .scale(Xscale);
+
+        var yAxis = d3.axisLeft()
+          .scale(Yscale);
+
+        svg.append("g")
+          .attr("transform", `translate(0, ${h})`)
+          .call(xAxis);
+        svg.append("g")
+          .call(yAxis);
+
+        // Actually add the tooltip
+        var div = d3.selectAll("body")
+          .append("div")
+          .attr("class", "tooltip")
+          .style("opacity", 0);
+
+        // Add the axis-labels
+        svg.append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", `translate(${w / 2}, ${h + margin.bottom / 1.5})`)
+          .text("Year")
+
+        svg.append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", `translate(${-margin.left / 1.5}, ${h / 2})rotate(-90)`)
+          .text("Tonne of Oil Equivalent")
+        }
+      });
+    </script>
+  </body>
+</html>

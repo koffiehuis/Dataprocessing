@@ -1,3 +1,35 @@
-/* Mark van Malestein
-10807640
-d3-scatterplot */
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 50px;
+  height: 28px;
+  padding: 2px;
+  font: 12px Arial;
+  background: lightblue;
+  border: 1px;
+  border-color: black;
+  border-radius: 16px;
+  pointer-events: none;
+}
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+text {
+  font: 13px Arial;
+}
+
+h1 {
+  font: 35px Arial;
+}
+
+h2 {
+  font: 25px Arial;
+}
+
+p {
+  font: 15px Arial;
+}
+body {
+  background-color: #DDDDDD;
+}

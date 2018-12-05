@@ -67,53 +67,51 @@ houseCountries) {
 
 
 function toArray(d, y) {
-  arr = [];
+  let arr = [];
+  let yearArray = [];
+  for (var i = startYear; i <= endYear; i++) {
+    yearArray.push(i)
+  }
   for (var key in d) {
     miniArr = [];
     index = 0;
     for (var mand = 0; mand < 9; mand++){
       if (isNaN(parseInt(d[key]["science"][mand]))) {
-        sci = -1;
+        sci = -1000;
       }
       else {
         sci = d[key]["science"][mand][0];
       }
       if (isNaN(parseInt(d[key]["house"][mand]))) {
-        hou = -1;
+        hou = -1000;
       }
       else {
         hou = d[key]["house"][mand][0];
       }
-      miniArr.push([key, sci, hou])
+      arr.push({id: key, science: sci, house: hou, year: yearArray[index]})
       index++;
     }
-    arr.push(miniArr);
   }
   return arr;
 }
 
 function makeChart(data) {
   // size
-  var margin = {top: 20, right: 10, bottom: 50, left: 80};
+  var xSpec = "year"
+  var ySpec = "science"
+
+  var margin = {top: 20, right: 30, bottom: 50, left: 80};
   var w = 1000 - margin.left - margin.right;
   var h = 600 - margin.top - margin.bottom;
 
-  var xMin = Math.min.apply(Math, getData(data, "science"));
-  var xMax = Math.max.apply(Math, getData(data, "science"));
+  valueList = getDatapoints(data, xSpec)
+  var xMin = d3.min(valueList);
+  var xMax = d3.max(valueList);
 
-  console.log(xMin)
-  console.log(xMax)
+  valueList = getDatapoints(data, ySpec)
+  var yMin = d3.min(valueList);
+  var yMax = d3.max(valueList);
 
-  var Yscale = d3.scaleLinear()
-                .domain([xMin, xMax])
-                .range([h, 0]);
-  var Xscale = d3.scaleLinear()
-                .domain([startYear, endYear])
-                .range([0, w])
-
-  // var xValue = function(d) {
-  //
-  // }
 
   var svg = d3.select("body")
     .append("svg")
@@ -122,28 +120,86 @@ function makeChart(data) {
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+  var yScale = d3.scaleLinear()
+        .domain([yMin, yMax])
+        .range([h, 0]),
+      yValue  = function(d) {
+        return d[ySpec];
+      },
+      yMap = function(d) {
+        return yScale(yValue(d));
+      },
+      yAxis = d3.axisLeft()
+        .scale(yScale);
+
+  var xScale = d3.scaleLinear()
+        .domain([xMin, xMax])
+        .range([0, w]),
+      xValue = function(d) {
+        return d[xSpec];
+      },
+      xMap = function(d) {
+        return xScale(xValue(d));
+      },
+      xAxis = d3.axisBottom()
+        .scale(xScale);
+
   svg.selectAll(".dot")
       .data(data)
-    .enter().append("circle")
+    .enter()
+      .append("circle")
       .attr("class", "dot")
-      .attr("cx", function(d) { return xScale(xValue(d));})
-      .attr("cy", function(d) { return yScale(xValue(d));})
+      .attr("r", 3.5)
+      .attr("cx", xMap)
+      .attr("cy", yMap)
+      .style("fill", "black")
+      .on("mouseover", function(d) {
+        div.transition()
+             .duration(200)
+             .style("opacity", .8);
+         div .html("KTOE:" + "<br>" + Math.round(d))
+             .style("left", (d3.event.pageX) + "px")
+             .style("top", (d3.event.pageY - 30) + "px");
+        d3.select(this)
+        .attr("fill", "blue");
+         })
+        .on("mouseout", function(d) {
+         div.transition()
+             .duration(500)
+             .style("opacity", 0);
+        });
+
+  svg.append("g")
+      .attr("transform", `translate(0, ${h})`)
+      .call(xAxis);
+  svg.append("g")
+      .call(yAxis);
+
+      // Show tooltip and change bar's color when the cursor hovers over
+
+  // Add the axis-labels
+  svg.append("text")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${w / 2}, ${h + margin.bottom / 1.5})`)
+      .text(`${xSpec}`)
+  svg.append("text")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${-margin.left / 2}, ${h / 2})rotate(-90)`)
+      .text(`${ySpec}`)
+
+  var div = d3.selectAll("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
 }
 
-// Functions to transform coordinates
-
-function getData(data, spec) {
-  array = [];
-  data.map(function (i) {
-    for (var elem in i) {
-      if (i[elem][1] > 0 && spec == "science") {
-        array.push(parseFloat(i[elem][1]))
-
-      }
-      if (i[elem][2] && spec == "house") {
-        array.push(parseFloat(i[elem][2]))
-      }
+function getDatapoints(data, spec) {
+  valueList  = [];
+  for (var elem in data) {
+    if (data[elem][spec] > -1){
+      valueList.push(data[elem][spec]);
     }
-  });
-  return array
+  }
+  return valueList;
 }

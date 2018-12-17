@@ -1,4 +1,4 @@
-var fileName = "json.json";
+var fileName = "https://raw.githubusercontent.com/koffiehuis/Dataprocessing/master/Homework/Week_6/json.json";
 const globalData = [];
 let globalOptions = [];
 let globalSpec = "";
